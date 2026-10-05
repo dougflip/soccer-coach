@@ -1,0 +1,31 @@
+/* Design tokens. Components reference these via var(--…); no raw colors in modules. */
+:root {
+  --color-ink: #16202a;
+  --color-ink-2: #4a5866;
+  --color-ink-3: #8593a0;
+  --color-surface: #ffffff;
+  --color-line: #e2ded5;
+  --color-grass: #2f8f4e;
+  --color-next: #e8771a;
+  --color-next-bg: #fff1e4;
+  --color-unavail: #c2413b;
+  --color-unavail-bg: #fbe9e8;
+  --color-accent: #1f5fbf;
+
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-surface);
+}

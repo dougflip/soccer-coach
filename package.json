@@ -1,0 +1,39 @@
+{
+  "name": "soccer-coach",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "lint": "oxlint --type-aware",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "check": "concurrently \"npm:typecheck\" \"npm:lint\" \"npm:format:check\""
+  },
+  "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^8.0.6",
+    "@rolldown/plugin-babel": "^0.2.4",
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "concurrently": "^10.0.5",
+    "oxfmt": "^0.72.0",
+    "oxlint": "^1.87.0",
+    "oxlint-tsgolint": "^7.0.2003",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2",
+    "vitest": "^5.0.3"
+  }
+}
