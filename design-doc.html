@@ -1,0 +1,934 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soccer Coach UX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #16202a;
+  --ink-2: #4a5866;
+  --ink-3: #8593a0;
+  --paper: #f6f4ef;
+  --card: #ffffff;
+  --line: #e2ded5;
+  --grass: #2f8f4e;
+  --grass-2: #2a8247;
+  --grass-line: rgba(255,255,255,.55);
+  --next: #e8771a;
+  --next-bg: #fff1e4;
+  --unavail: #c2413b;
+  --unavail-bg: #fbe9e8;
+  --accent: #1f5fbf;
+  --accent-bg: #e7effb;
+  --ok: #2f8f4e;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 15px/1.55 Inter, system-ui, sans-serif;
+}
+main { max-width: 1120px; margin: 0 auto; padding: 48px 16px 120px; }
+h1 { font-size: 40px; line-height: 1.1; margin: 0 0 8px; letter-spacing: -.02em; }
+h2 { font-size: 26px; margin: 64px 0 8px; letter-spacing: -.01em; padding-top: 16px; border-top: 2px solid var(--ink); }
+h3 { font-size: 18px; margin: 32px 0 8px; }
+p, li { max-width: 72ch; }
+.lede { font-size: 18px; color: var(--ink-2); max-width: 64ch; }
+.meta { color: var(--ink-3); font-size: 13px; }
+code, .mono { font-family: var(--mono); font-size: .9em; }
+nav.toc { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 24px; margin: 24px 0; }
+nav.toc ol { margin: 0; padding-left: 20px; columns: 2; column-gap: 32px; }
+nav.toc a { color: var(--accent); text-decoration: none; }
+.note { background: var(--accent-bg); border-left: 4px solid var(--accent); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 16px 0; max-width: 80ch; }
+.q { background: var(--next-bg); border-left: 4px solid var(--next); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 16px 0; max-width: 80ch; }
+table.doc { border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+table.doc th, table.doc td { border-bottom: 1px solid var(--line); padding: 6px 12px; text-align: left; vertical-align: top; }
+table.doc th { font-weight: 600; color: var(--ink-2); }
+
+/* ---------- mockup layout ---------- */
+.screens { display: flex; flex-wrap: wrap; gap: 32px; margin: 24px 0; align-items: flex-start; }
+.shot { display: flex; flex-direction: column; gap: 10px; width: 300px; }
+.shot figcaption { font-size: 13px; color: var(--ink-2); }
+.shot figcaption b { color: var(--ink); display: block; font-size: 14px; }
+figure { margin: 0; }
+.withnotes { display: grid; grid-template-columns: 300px 1fr; gap: 32px; align-items: start; margin: 24px 0; }
+.withnotes ol { margin-top: 0; }
+@media (max-width: 720px) {
+  .withnotes { grid-template-columns: 1fr; }
+  nav.toc ol { columns: 1; }
+  h1 { font-size: 30px; }
+}
+
+/* ---------- phone ---------- */
+.phone {
+  width: 300px; height: 620px; background: #0e1318; border-radius: 38px; padding: 10px;
+  box-shadow: 0 18px 40px -18px rgba(0,0,0,.45);
+  flex: none;
+}
+.scr {
+  position: relative; width: 100%; height: 100%; background: #fff; border-radius: 29px; overflow: hidden;
+  display: flex; flex-direction: column; font-size: 12px; line-height: 1.35; color: var(--ink);
+}
+.status { height: 22px; flex: none; display: flex; justify-content: space-between; padding: 4px 20px 0; font-size: 10px; font-weight: 600; }
+.appbar { flex: none; padding: 6px 14px 10px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); }
+.appbar .title { font-weight: 700; font-size: 16px; flex: 1; }
+.appbar .sub { font-size: 11px; color: var(--ink-3); font-weight: 500; display: block; }
+.appbar .back { font-size: 18px; color: var(--accent); width: 18px; }
+.iconbtn { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: #eef1f4; font-weight: 700; color: var(--ink-2); font-size: 14px; }
+.body { flex: 1; overflow: hidden; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+.tabs { flex: none; display: flex; border-top: 1px solid var(--line); padding: 6px 0 14px; }
+.tabs div { flex: 1; text-align: center; font-size: 10px; color: var(--ink-3); font-weight: 600; }
+.tabs div i { display: block; font-style: normal; font-size: 16px; line-height: 1.2; }
+.tabs .on { color: var(--accent); }
+.btn { display: block; text-align: center; font-weight: 700; border-radius: 12px; padding: 11px; font-size: 13px; background: var(--ink); color: #fff; }
+.btn.next { background: var(--next); }
+.btn.ghost { background: #eef1f4; color: var(--ink); }
+.btn.green { background: var(--grass); }
+.btn.sm { padding: 6px 10px; font-size: 11px; border-radius: 9px; display: inline-block; }
+.sect { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin-top: 4px; display: flex; justify-content: space-between; }
+.row { display: flex; align-items: center; gap: 8px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.row .grow { flex: 1; min-width: 0; }
+.row .nm { font-weight: 600; font-size: 13px; }
+.row .dim { color: var(--ink-3); font-size: 11px; }
+.pill { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; background: #eef1f4; color: var(--ink-2); white-space: nowrap; }
+.pill.live { background: var(--grass); color: #fff; }
+.pill.next { background: var(--next-bg); color: var(--next); }
+.pill.unav { background: var(--unavail-bg); color: var(--unavail); }
+.pill.blue { background: var(--accent-bg); color: var(--accent); }
+.toggle { width: 34px; height: 20px; border-radius: 99px; background: #d5dbe0; position: relative; flex: none; }
+.toggle::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.toggle.on { background: var(--grass); }
+.toggle.on::after { left: 16px; }
+.num { width: 26px; height: 26px; border-radius: 50%; background: #eef1f4; display: grid; place-items: center; font-weight: 700; font-size: 11px; color: var(--ink-2); flex: none; }
+
+/* clock header */
+.clockbar { flex: none; background: var(--ink); color: #fff; padding: 6px 14px 10px; display: flex; align-items: center; gap: 10px; }
+.clockbar .half { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
+.clockbar .vs { font-size: 11px; opacity: .85; }
+.clockbar .clock { white-space: nowrap; font-family: var(--mono); font-size: 30px; font-weight: 700; letter-spacing: -.02em; line-height: 1; }
+.clockbar .grow { flex: 1; }
+.clockbar .cbtn { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.14); display: grid; place-items: center; font-size: 13px; }
+.seg { display: flex; background: #eef1f4; border-radius: 10px; padding: 3px; flex: none; }
+.seg div { flex: 1; text-align: center; padding: 6px 4px; border-radius: 8px; font-weight: 700; font-size: 11px; color: var(--ink-2); }
+.seg .on { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.seg .on.nx { color: var(--next); }
+.seg .badge { background: var(--next); color: #fff; border-radius: 99px; padding: 0 5px; font-size: 9px; margin-left: 3px; }
+
+/* field */
+.field {
+  position: relative; flex: none; height: 250px; border-radius: 12px; overflow: hidden;
+  background: repeating-linear-gradient(180deg, var(--grass) 0 25px, var(--grass-2) 25px 50px);
+}
+.field.sm { height: 150px; }
+.field::before { /* halfway line + center circle */
+  content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 0; border-top: 2px solid var(--grass-line);
+}
+.field .box { position: absolute; left: 28%; right: 28%; bottom: 0; height: 18%; border: 2px solid var(--grass-line); border-bottom: none; }
+.field .arc { position: absolute; left: 38%; right: 38%; top: -28px; height: 56px; border: 2px solid var(--grass-line); border-radius: 50%; }
+.field .dir { position: absolute; right: 8px; top: 6px; font-size: 9px; color: rgba(255,255,255,.8); font-weight: 700; letter-spacing: .05em; }
+.slot {
+  position: absolute; transform: translate(-50%, -50%); width: 78px; text-align: center;
+  background: #fff; border-radius: 10px; padding: 4px 4px 5px; box-shadow: 0 2px 4px rgba(0,0,0,.18);
+}
+.field.sm .slot { width: 64px; padding: 2px 2px 3px; }
+.slot .pos { font-size: 9px; font-weight: 800; color: var(--grass); letter-spacing: .04em; }
+.slot .pn { font-weight: 700; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.field.sm .slot .pn { font-size: 10px; }
+.slot .pt { font-size: 10px; color: var(--ink-3); font-family: var(--mono); }
+.slot.empty { background: rgba(255,255,255,.18); border: 2px dashed rgba(255,255,255,.8); box-shadow: none; color: #fff; }
+.slot.empty .pos { color: #fff; }
+.slot.empty .pn { font-weight: 500; opacity: .9; }
+.slot.chg { outline: 3px solid var(--next); }
+.slot.chg .out { font-size: 9px; color: var(--next); font-weight: 700; }
+.slot.sel { outline: 3px solid var(--accent); }
+.slot.hurt { outline: 3px solid var(--unavail); }
+.slot .pt { white-space: nowrap; }
+.slot .pt b { color: var(--ink); }
+.slot .pt .long { background: var(--ink); color: #fff; border-radius: 4px; padding: 0 3px; font-weight: 700; }
+.slot.longest { box-shadow: 0 0 0 2px var(--ink), 0 2px 4px rgba(0,0,0,.18); }
+.bchip .pt small { display: block; font-size: 9px; color: var(--ink-3); text-align: right; font-weight: 400; }
+.s-lf { left: 18%; top: 17%; } .s-cf { left: 50%; top: 13%; } .s-rf { left: 82%; top: 17%; }
+.s-lb { left: 18%; top: 54%; } .s-cb { left: 50%; top: 58%; } .s-rb { left: 82%; top: 54%; }
+.s-gk { left: 50%; top: 86%; }
+
+/* bench chips */
+.bench { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.bchip { border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; display: flex; justify-content: space-between; align-items: center; gap: 4px; background: #fff; }
+.bchip .pn { font-weight: 700; font-size: 12px; }
+.bchip .pt { font-family: var(--mono); font-size: 10px; color: var(--ink-3); }
+.bchip.unav { background: var(--unavail-bg); border-color: #efc9c6; }
+.bchip.unav .pn { color: var(--unavail); }
+.bchip.sel { outline: 3px solid var(--accent); }
+.bchip.out { border: 2px dashed var(--next); }
+.bchip.low .pt { color: var(--next); font-weight: 700; }
+.foot { flex: none; padding: 8px 12px 16px; border-top: 1px solid var(--line); background: #fff; }
+.hint { font-size: 10px; color: var(--ink-3); text-align: center; }
+
+/* sheet / toast */
+.scrim { position: absolute; inset: 0; background: rgba(14,19,24,.45); }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 18px 18px 0 0; padding: 8px 14px 18px; display: flex; flex-direction: column; gap: 8px; }
+.sheet .grab { width: 36px; height: 4px; border-radius: 2px; background: #d5dbe0; margin: 0 auto 4px; }
+.sheet h4 { margin: 0; font-size: 15px; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { border: 1px solid var(--line); border-radius: 99px; padding: 4px 10px; font-size: 11px; font-weight: 600; }
+.chip.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.toast { position: absolute; left: 10px; right: 10px; bottom: 70px; background: var(--ink); color: #fff; border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 18px rgba(0,0,0,.25); }
+.toast .grow { flex: 1; font-size: 11px; }
+.toast a { color: #ffb36b; font-weight: 700; font-size: 11px; }
+
+/* stats grid */
+.grid { width: 100%; border-collapse: collapse; font-size: 10px; }
+.grid th { font-size: 9px; color: var(--ink-3); font-weight: 700; padding: 3px 1px; text-align: center; }
+.grid th:first-child, .grid td:first-child { text-align: left; }
+.grid td { padding: 0; text-align: center; font-family: var(--mono); height: 25px; border-bottom: 1px solid #f0f0f0; }
+.grid td:first-child { font-family: Inter, sans-serif; font-weight: 600; font-size: 11px; white-space: nowrap; padding-right: 2px; }
+.h0 { background: #fff; color: var(--unavail); font-weight: 700; }
+.h1 { background: #e3f2e7; } .h2 { background: #bfe1c9; } .h3 { background: #8fcaa1; } .h4 { background: #5aae74; color: #fff; }
+.bar { height: 8px; border-radius: 4px; background: #eef1f4; overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--grass); }
+.bar span.b { background: #b9c3cc; } .bar span.u { background: var(--unavail); }
+.stack { display: flex; height: 10px; border-radius: 5px; overflow: hidden; }
+.stack span { display: block; height: 100%; }
+
+/* timeline */
+.tl { display: flex; flex-direction: column; gap: 6px; }
+.tlrow { display: grid; grid-template-columns: 44px 1fr auto; gap: 8px; align-items: center; border: 1px solid var(--line); border-radius: 10px; padding: 7px 8px; }
+.tlrow .tm { font-family: var(--mono); font-weight: 700; font-size: 11px; }
+.tlrow .what { font-size: 11px; }
+.tlrow .what b { font-weight: 700; }
+.tlrow .ed { color: var(--accent); font-weight: 700; font-size: 11px; }
+.tlrow.hl { border-color: var(--accent); background: var(--accent-bg); }
+
+/* flow diagram */
+.flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 16px 0; }
+.flow .st { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 8px 12px; font-weight: 600; font-size: 14px; }
+.flow .st.live { background: var(--grass); color: #fff; border-color: var(--grass); }
+.flow .arr { color: var(--ink-3); font-weight: 700; }
+.legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; margin: 8px 0; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Soccer Coach: UX design</h1>
+<p class="meta">Version 0.2 · 2026-10-05 · Input: <code>high-level-design.md</code></p>
+<p class="lede">What the app looks like and how it behaves, screen by screen. This is a UI/UX doc, not an architecture doc. Data storage, sync and auth details come later in a separate tech doc.</p>
+
+<nav class="toc">
+<ol>
+  <li><a href="#principles">Design principles</a></li>
+  <li><a href="#glossary">Glossary &amp; player states</a></li>
+  <li><a href="#map">App map &amp; game lifecycle</a></li>
+  <li><a href="#roster">Roster</a></li>
+  <li><a href="#games">Games list</a></li>
+  <li><a href="#pregame">Pre-game: attendance &amp; starting lineup</a></li>
+  <li><a href="#live">Live game</a></li>
+  <li><a href="#subflow">Flow: queue &amp; make subs</a></li>
+  <li><a href="#unavail">Flow: injury / unavailable / late arrival</a></li>
+  <li><a href="#halftime">Halftime &amp; end of game</a></li>
+  <li><a href="#review">Game review &amp; editing</a></li>
+  <li><a href="#stats">Stats</a></li>
+  <li><a href="#misc">Sign-in, two coaches, dim mode</a></li>
+  <li><a href="#oos">Out of scope</a></li>
+  <li><a href="#questions">Decisions &amp; open questions</a></li>
+</ol>
+</nav>
+
+<!-- ================================================================ -->
+<h2 id="principles">1. Design principles</h2>
+<ol>
+  <li><b>Built for the sideline.</b> Used one-handed, standing, in sunlight, while watching kids. Big tap targets, high contrast, light theme, very little text entry during a game.</li>
+  <li><b>Tap, then tap.</b> Lineup changes are always "tap a player, then tap where they go" (a slot or another player to swap with). No drag-and-drop. It's more reliable on phones and works with gloves on.</li>
+  <li><b>The clock never blocks you.</b> The game clock keeps running whatever screen you're on. Recording a sub takes one tap at the stoppage, because the prep happens beforehand.</li>
+  <li><b>Fairness visible at a glance.</b> Every player chip shows that player's minutes this game. Bench players are sorted with the fewest minutes first.</li>
+  <li><b>Mistakes are cheap.</b> Every action has a short Undo, and the whole game can be edited afterward. Coaches should never hesitate to tap.</li>
+  <li><b>Coaches decide.</b> The app records and shows data. It doesn't suggest lineups or enforce rules.</li>
+</ol>
+
+<!-- ================================================================ -->
+<h2 id="glossary">2. Glossary &amp; player states</h2>
+<table class="doc">
+  <tr><th>Term</th><th>Meaning</th></tr>
+  <tr><td><b>Roster</b></td><td>All players on the team for the season. First name + last initial(s). Initials can be more than one letter to tell apart two players with the same name.</td></tr>
+  <tr><td><b>Present</b></td><td>The player showed up for this game. Set before the game, and can be set mid-game for a late arrival.</td></tr>
+  <tr><td><b>On field / Bench</b></td><td>Where a present player is right now.</td></tr>
+  <tr><td><b>Available / Unavailable</b></td><td>Whether a present player can go in right now (injury, sick, bathroom, etc.). Tracked as time windows.</td></tr>
+  <tr><td><b>Stint</b></td><td>One player's continuous time on the field, from coming off the bench until going back to it. Position moves don't end a stint.</td></tr>
+  <tr><td><b>Shift</b></td><td>The stretch of time between two subs. A game is a sequence of shifts, and each shift has one lineup.</td></tr>
+  <tr><td><b>Next Up</b></td><td>The queued lineup for the next shift. Built while play continues, then applied with one tap ("Sub now") at a stoppage.</td></tr>
+  <tr><td><b>Positions</b></td><td>7v7: <b>GK</b>, <b>LB CB RB</b> (defenders), <b>LF CF RF</b> (forwards). Stored as config so the formation can change later.</td></tr>
+</table>
+
+<h3>State layers for a single player in a game</h3>
+<div class="flow">
+  <span class="st">Roster</span><span class="arr">→</span>
+  <span class="st">Present?</span><span class="arr">→</span>
+  <span class="st">On field <span class="meta">(position)</span> / Bench</span><span class="arr">×</span>
+  <span class="st">Available / Unavailable</span>
+</div>
+<p>Every minute a present player spends in a game falls into exactly one bucket. These buckets drive all the stats:</p>
+<div class="legend">
+  <span><i class="sw" style="background:var(--grass)"></i> On field (per position)</span>
+  <span><i class="sw" style="background:#b9c3cc"></i> Bench, available</span>
+  <span><i class="sw" style="background:var(--unavail)"></i> Bench, unavailable</span>
+</div>
+<p class="meta">A player on the field who becomes unavailable is subbed off at that moment (see <a href="#unavail">§9</a>), so "on field + unavailable" never happens.</p>
+
+<!-- ================================================================ -->
+<h2 id="map">3. App map &amp; game lifecycle</h2>
+<p>Three bottom tabs. The game screens open from the Games tab.</p>
+<div class="flow">
+  <span class="st">Games</span><span class="arr">→</span><span class="st">Game (pre-game / live / review)</span>
+</div>
+<div class="flow">
+  <span class="st">Roster</span><span class="arr">→</span><span class="st">Add / edit player</span>
+</div>
+<div class="flow">
+  <span class="st">Stats</span><span class="arr">→</span><span class="st">Team grid</span><span class="arr">→</span><span class="st">Player detail</span><span class="arr">→</span><span class="st">Player in one game</span>
+</div>
+
+<h3>Game lifecycle</h3>
+<p>A game moves through these states. The Game screen shows a different view for each one.</p>
+<div class="flow">
+  <span class="st">Scheduled</span><span class="arr">→</span>
+  <span class="st">Pre-game</span><span class="arr">→</span>
+  <span class="st live">1st half</span><span class="arr">→</span>
+  <span class="st">Halftime</span><span class="arr">→</span>
+  <span class="st live">2nd half</span><span class="arr">→</span>
+  <span class="st">Final</span>
+</div>
+<p class="meta">Final games stay editable. "Final" just means the clock is done.</p>
+
+<!-- ================================================================ -->
+<h2 id="roster">4. Roster</h2>
+<p>Set up once at the start of the season and rarely touched after that.</p>
+<div class="screens">
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>9:41</span><span>●●●</span></div>
+      <div class="appbar"><span class="title">Roster<span class="sub">11 players</span></span><span class="iconbtn">+</span></div>
+      <div class="body">
+        <div class="row"><span class="grow"><div class="nm">Ava K.</div></span><span class="dim">›</span></div>
+        <div class="row"><span class="grow"><div class="nm">Chloe D.</div></span><span class="dim">›</span></div>
+        <div class="row"><span class="grow"><div class="nm">Ella S.</div></span><span class="dim">›</span></div>
+        <div class="row"><span class="grow"><div class="nm">Emma T.</div></span><span class="dim">›</span></div>
+        <div class="row"><span class="grow"><div class="nm">Harper J.</div></span><span class="dim">›</span></div>
+        <div class="row"><span class="grow"><div class="nm">Lily P.</div></span><span class="dim">›</span></div>
+        <div class="row"><span class="grow"><div class="nm">Maya R.</div></span><span class="dim">›</span></div>
+        <div class="row"><span class="grow"><div class="nm">Nora B.</div></span><span class="dim">›</span></div>
+        <div class="row"><span class="grow"><div class="nm">Ruby W.</div></span><span class="dim">›</span></div>
+        <div class="row"><span class="grow"><div class="nm">Sofia L.</div></span><span class="dim">›</span></div>
+      </div>
+      <div class="tabs"><div><i>⚽</i>Games</div><div class="on"><i>👥</i>Roster</div><div><i>📊</i>Stats</div></div>
+    </div></div>
+    <figcaption><b>Roster list</b>Alphabetical. Tap a row to edit, + to add.</figcaption>
+  </figure>
+
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>9:41</span><span>●●●</span></div>
+      <div class="appbar"><span class="back">‹</span><span class="title">Edit player</span><span style="color:var(--accent);font-weight:700">Save</span></div>
+      <div class="body" style="gap:12px">
+        <div><div class="sect">First name</div><div class="row"><span class="nm">Maya</span></div></div>
+        <div><div class="sect">Last initial(s)</div><div class="row"><span class="nm">R</span></div></div>
+        <div class="hint" style="text-align:left">Use more letters if two players clash, e.g. “Jane Do.” and “Jane Du.”</div>
+        <div style="flex:1"></div>
+        <div class="row" style="border-color:#efc9c6"><span class="grow"><div class="nm" style="color:var(--unavail)">Remove from roster</div><div class="dim">Her stats from past games are kept.</div></span></div>
+        <div class="hint">Shown on chips as “Maya R.”</div>
+      </div>
+    </div></div>
+    <figcaption><b>Add / edit player</b>Two fields. "Remove" archives the player so past stats survive. A true delete is only allowed if she has never played a game.</figcaption>
+  </figure>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="games">5. Games list</h2>
+<div class="withnotes">
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>9:41</span><span>●●●</span></div>
+      <div class="appbar"><span class="title">Games<span class="sub">Fall 2026</span></span><span class="iconbtn">+</span></div>
+      <div class="body">
+        <div class="sect">Now</div>
+        <div class="row" style="border-color:var(--grass);border-width:2px"><span class="grow"><div class="nm">vs Tigers</div><div class="dim">Sat Oct 10 · 9:00 AM · Field 3</div></span><span class="pill live">LIVE 1H 18:42</span></div>
+        <div class="sect">Upcoming</div>
+        <div class="row"><span class="grow"><div class="nm">vs Lightning</div><div class="dim">Sat Oct 17 · 10:30 AM</div></span><span class="pill">Scheduled</span></div>
+        <div class="row"><span class="grow"><div class="nm">vs Comets</div><div class="dim">Sat Oct 24 · 9:00 AM</div></span><span class="pill">Scheduled</span></div>
+        <div class="sect">Past</div>
+        <div class="row"><span class="grow"><div class="nm">vs Rockets</div><div class="dim">Sat Oct 3 · 10 present</div></span><span class="pill">Final</span></div>
+        <div class="row"><span class="grow"><div class="nm">vs Blaze</div><div class="dim">Sat Sep 26 · 11 present</div></span><span class="pill">Final</span></div>
+        <div class="row"><span class="grow"><div class="nm">vs Sharks</div><div class="dim">Sat Sep 19 · 9 present</div></span><span class="pill">Final</span></div>
+      </div>
+      <div class="tabs"><div class="on"><i>⚽</i>Games</div><div><i>👥</i>Roster</div><div><i>📊</i>Stats</div></div>
+    </div></div>
+    <figcaption><b>Games list</b></figcaption>
+  </figure>
+  <div>
+    <ol>
+      <li>The home screen. A live game is pinned to the top and shows its clock, so after reopening the app you're one tap from the game.</li>
+      <li><b>+ New game</b> asks for date/time, opponent and optional location. That's all.</li>
+      <li>Tapping a game opens the view that matches its state: pre-game, live or review.</li>
+      <li>Scores are not shown (out of scope).</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="pregame">6. Pre-game: attendance &amp; starting lineup</h2>
+<p>Two quick steps before kickoff. Both can be done at home the night before (starting lineup) or at the field (attendance).</p>
+<div class="screens">
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>8:48</span><span>●●●</span></div>
+      <div class="appbar"><span class="back">‹</span><span class="title">vs Tigers<span class="sub">Step 1 of 2 · Who's here?</span></span></div>
+      <div class="body" style="gap:6px">
+        <div class="sect"><span>Present</span><span>9 of 11</span></div>
+        <div class="row"><span class="grow nm">Ava K.</span><span class="toggle on"></span></div>
+        <div class="row"><span class="grow nm">Chloe D.</span><span class="toggle on"></span></div>
+        <div class="row"><span class="grow nm">Ella S.</span><span class="toggle"></span></div>
+        <div class="row"><span class="grow nm">Emma T.</span><span class="toggle on"></span></div>
+        <div class="row"><span class="grow nm">Harper J.</span><span class="toggle on"></span></div>
+        <div class="row"><span class="grow nm">Lily P.</span><span class="toggle on"></span></div>
+        <div class="row"><span class="grow nm">Maya R.</span><span class="toggle on"></span></div>
+        <div class="row"><span class="grow nm">Nora B.</span><span class="toggle"></span></div>
+        <div class="row"><span class="grow nm">Ruby W.</span><span class="toggle on"></span></div>
+        <div class="row"><span class="grow nm">Sofia L.</span><span class="toggle on"></span></div>
+      </div>
+      <div class="foot"><span class="btn">Next: starting lineup</span></div>
+    </div></div>
+    <figcaption><b>Attendance</b>Everyone defaults to present, so you only switch off the absent kids. Can be changed later (late arrivals).</figcaption>
+  </figure>
+
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>8:52</span><span>●●●</span></div>
+      <div class="appbar"><span class="back">‹</span><span class="title">vs Tigers<span class="sub">Step 2 of 2 · Starting lineup</span></span></div>
+      <div class="body">
+        <div class="field">
+          <div class="box"></div><span class="dir">ATTACK ↑</span>
+          <div class="slot s-lf"><div class="pos">LF</div><div class="pn">Emma T.</div></div>
+          <div class="slot s-cf"><div class="pos">CF</div><div class="pn">Ava K.</div></div>
+          <div class="slot s-rf empty"><div class="pos">RF</div><div class="pn">tap to fill</div></div>
+          <div class="slot s-lb"><div class="pos">LB</div><div class="pn">Lily P.</div></div>
+          <div class="slot s-cb sel"><div class="pos">CB</div><div class="pn">Ruby W.</div></div>
+          <div class="slot s-rb"><div class="pos">RB</div><div class="pn">Sofia L.</div></div>
+          <div class="slot s-gk"><div class="pos">GK</div><div class="pn">Maya R.</div></div>
+        </div>
+        <div class="sect"><span>Bench · tap to place</span><span>season min</span></div>
+        <div class="bench">
+          <div class="bchip"><span class="pn">Chloe D.</span><span class="pt">142</span></div>
+          <div class="bchip low"><span class="pn">Harper J.</span><span class="pt">118</span></div>
+        </div>
+        <div class="hint">CB selected · tap a bench player or another slot to swap</div>
+      </div>
+      <div class="foot"><span class="btn green">Start 1st half ▶</span></div>
+    </div></div>
+    <figcaption><b>Starting lineup</b>Same field + bench layout as the live game, so there's one pattern to learn. Bench shows season minutes here, since there are no game minutes yet.</figcaption>
+  </figure>
+</div>
+<div class="note"><b>Interaction (used everywhere a lineup is built):</b>
+<ol>
+  <li>Tap a player (slot or bench chip). It gets a blue outline.</li>
+  <li>Tap a target: an empty slot moves them there, a filled slot or bench chip swaps the two.</li>
+  <li>Tap the selected player again to cancel.</li>
+</ol>
+"Start 1st half" works even with empty slots (in case you're short players). The app warns you but doesn't block.</div>
+
+<!-- ================================================================ -->
+<h2 id="live">7. Live game</h2>
+<p>The main screen of the app. It has a pinned clock at the top and a <b>On Field / Next Up</b> toggle. The field and bench below always show the selected view.</p>
+
+<div class="withnotes">
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>9:21</span><span>●●●</span></div>
+      <div class="clockbar">
+        <div><div class="half">1st half</div><div class="vs">vs Tigers</div></div>
+        <div class="grow"></div>
+        <div class="clock">18:42</div>
+        <div class="cbtn">⋯</div>
+      </div>
+      <div class="body">
+        <div class="seg"><div class="on">On Field</div><div>Next Up</div></div>
+        <div class="field">
+          <div class="box"></div>
+          <div class="slot longest s-lf"><div class="pos">LF</div><div class="pn">Emma T.</div><div class="pt"><span class="long">on 18</span> · 18m</div></div>
+          <div class="slot s-cf"><div class="pos">CF</div><div class="pn">Ava K.</div><div class="pt"><b>on 12</b> · 15m</div></div>
+          <div class="slot s-rf"><div class="pos">RF</div><div class="pn">Chloe D.</div><div class="pt"><b>on 8</b> · 14m</div></div>
+          <div class="slot longest s-lb"><div class="pos">LB</div><div class="pn">Lily P.</div><div class="pt"><span class="long">on 18</span> · 18m</div></div>
+          <div class="slot s-cb"><div class="pos">CB</div><div class="pn">Ruby W.</div><div class="pt"><b>on 12</b> · 12m</div></div>
+          <div class="slot s-rb"><div class="pos">RB</div><div class="pn">Harper J.</div><div class="pt"><b>on 8</b> · 8m</div></div>
+          <div class="slot s-gk"><div class="pos">GK</div><div class="pn">Maya R.</div><div class="pt"><b>on 18</b> · 18m</div></div>
+        </div>
+        <div class="sect"><span>Bench · 2</span><span>game · season</span></div>
+        <div class="bench">
+          <div class="bchip"><span class="pn">Sofia L.</span><span class="pt">10m<small>96 szn</small></span></div>
+          <div class="bchip unav"><span class="pn">Zoe M.</span><span class="pt">✕ 0m<small>45 szn</small></span></div>
+        </div>
+        <div class="hint" style="margin-top:auto">Tap any player for options · last sub 10:15</div>
+      </div>
+    </div></div>
+    <figcaption><b>Live: On Field</b>Read-only view of who's out there now. Each slot shows the current stint ("on 18m") and total game minutes.</figcaption>
+  </figure>
+  <div>
+    <h3 style="margin-top:0">Anatomy</h3>
+    <ol>
+      <li><b>Clock bar.</b> Dark, sticky, big monospace digits, readable at arm's length. Counts <i>up</i> from 0:00 each half and keeps going until the coach taps <b>End half</b> (or <b>End game</b> in the 2nd half). Halves don't have to be exactly 30:00.</li>
+      <li><b>⋯ menu</b>: End half / End game, Pause clock (rarely needed, the clock normally runs nonstop), Adjust clock (if the app was started late), Dim mode, Game timeline.</li>
+      <li><b>Field.</b> Attack is up. Each slot shows position, name, <b>stint</b> (time on the field since they last came off the bench) and game total: <span class="mono">on 8m · 18m</span>. Position moves on the field don't reset the stint.</li>
+      <li><b>Longest-stint highlight.</b> The 2 outfield players with the longest current stint (ties included) get a dark outline and pill, so after several quick subs in a row you can see who's been out there longest. GK is left out since they usually play the whole half. Shown in On Field and while building Next Up.</li>
+      <li><b>Bench.</b> Each chip shows game minutes plus season minutes underneath. Sorted by fewest game minutes first, unavailable players last (red ✕).</li>
+      <li><b>Tapping a player in On Field</b> opens the player sheet (mark unavailable, emergency sub, see minutes). Lineup changes happen in Next Up.</li>
+      <li>The screen stays awake (wake lock) while a half is running.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="subflow">8. Flow: queue &amp; make subs</h2>
+<p>Subs happen at stoppages while the clock keeps running. The coach builds <b>Next Up</b> during play, gets the kids ready at the sideline, and taps <b>Sub now</b> when the ref allows. The shift change is stamped at the clock time of that tap.</p>
+
+<div class="screens">
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>9:22</span><span>●●●</span></div>
+      <div class="clockbar">
+        <div><div class="half">1st half</div><div class="vs">vs Tigers</div></div>
+        <div class="grow"></div>
+        <div class="clock">19:05</div>
+        <div class="cbtn">⋯</div>
+      </div>
+      <div class="body">
+        <div class="seg"><div>On Field</div><div class="on nx">Next Up</div></div>
+        <div class="field">
+          <div class="box"></div>
+          <div class="slot longest s-lf"><div class="pos">LF</div><div class="pn">Emma T.</div><div class="pt"><span class="long">on 19</span> · 19m</div></div>
+          <div class="slot s-cf"><div class="pos">CF</div><div class="pn">Ava K.</div><div class="pt"><b>on 13</b> · 16m</div></div>
+          <div class="slot s-rf"><div class="pos">RF</div><div class="pn">Chloe D.</div><div class="pt"><b>on 9</b> · 15m</div></div>
+          <div class="slot longest s-lb sel"><div class="pos">LB</div><div class="pn">Lily P.</div><div class="pt"><span class="long">on 19</span> · 19m</div></div>
+          <div class="slot s-cb"><div class="pos">CB</div><div class="pn">Ruby W.</div><div class="pt"><b>on 13</b> · 13m</div></div>
+          <div class="slot s-rb"><div class="pos">RB</div><div class="pn">Harper J.</div><div class="pt"><b>on 9</b> · 9m</div></div>
+          <div class="slot s-gk"><div class="pos">GK</div><div class="pn">Maya R.</div><div class="pt"><b>on 19</b> · 19m</div></div>
+        </div>
+        <div class="sect"><span>Bench · tap to swap in</span><span>game · season</span></div>
+        <div class="bench">
+          <div class="bchip"><span class="pn">Sofia L.</span><span class="pt">10m<small>96 szn</small></span></div>
+          <div class="bchip unav"><span class="pn">Zoe M.</span><span class="pt">✕ 0m<small>45 szn</small></span></div>
+        </div>
+        <div class="hint" style="margin-top:auto">Starts as a copy of On Field · LB selected</div>
+      </div>
+    </div></div>
+    <figcaption><b>① Open Next Up</b>Starts as a copy of the current lineup. Tap LB (Lily)…</figcaption>
+  </figure>
+
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>9:24</span><span>●●●</span></div>
+      <div class="clockbar">
+        <div><div class="half">1st half</div><div class="vs">vs Tigers</div></div>
+        <div class="grow"></div>
+        <div class="clock">21:30</div>
+        <div class="cbtn">⋯</div>
+      </div>
+      <div class="body">
+        <div class="seg"><div>On Field</div><div class="on nx">Next Up <span class="badge">3</span></div></div>
+        <div class="field">
+          <div class="box"></div>
+          <div class="slot s-lf chg"><div class="pos">LF</div><div class="pn">Ruby W.</div><div class="out">was Emma</div></div>
+          <div class="slot s-cf"><div class="pos">CF</div><div class="pn">Ava K.</div><div class="pt"><b>on 15</b> · 18m</div></div>
+          <div class="slot s-rf"><div class="pos">RF</div><div class="pn">Chloe D.</div><div class="pt"><b>on 11</b> · 17m</div></div>
+          <div class="slot s-lb chg"><div class="pos">LB</div><div class="pn">Sofia L.</div><div class="out">IN · 10m</div></div>
+          <div class="slot s-cb chg"><div class="pos">CB</div><div class="pn">Emma T.</div><div class="out">was Ruby</div></div>
+          <div class="slot s-rb"><div class="pos">RB</div><div class="pn">Harper J.</div><div class="pt"><b>on 11</b> · 11m</div></div>
+          <div class="slot s-gk"><div class="pos">GK</div><div class="pn">Maya R.</div><div class="pt"><b>on 21</b> · 21m</div></div>
+        </div>
+        <div class="sect"><span>Bench next shift</span><span></span></div>
+        <div class="bench">
+          <div class="bchip out"><span class="pn">Lily P.</span><span class="pt">OUT</span></div>
+          <div class="bchip unav"><span class="pn">Zoe M.</span><span class="pt">✕</span></div>
+        </div>
+        <div class="row" style="padding:6px 8px;background:var(--next-bg);border-color:#f5d2b0">
+          <span class="grow" style="font-size:11px"><b>In:</b> Sofia → LB · <b>Out:</b> Lily<br><b>Move:</b> Ruby CB→LF · Emma LF→CB</span>
+        </div>
+      </div>
+      <div class="foot" style="display:flex;gap:8px"><span class="btn ghost" style="flex:1">Reset</span><span class="btn next" style="flex:2">Sub now ⇄</span></div>
+    </div></div>
+    <figcaption><b>② Queue is ready</b>Changed slots are outlined in orange and the toggle shows a badge count. The summary card doubles as the sideline call list. Play continues meanwhile.</figcaption>
+  </figure>
+
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>9:26</span><span>●●●</span></div>
+      <div class="clockbar">
+        <div><div class="half">1st half</div><div class="vs">vs Tigers</div></div>
+        <div class="grow"></div>
+        <div class="clock">23:08</div>
+        <div class="cbtn">⋯</div>
+      </div>
+      <div class="body">
+        <div class="seg"><div class="on">On Field</div><div>Next Up</div></div>
+        <div class="field">
+          <div class="box"></div>
+          <div class="slot longest s-lf"><div class="pos">LF</div><div class="pn">Ruby W.</div><div class="pt"><span class="long">on 17</span> · 17m</div></div>
+          <div class="slot longest s-cf"><div class="pos">CF</div><div class="pn">Ava K.</div><div class="pt"><span class="long">on 17</span> · 20m</div></div>
+          <div class="slot s-rf"><div class="pos">RF</div><div class="pn">Chloe D.</div><div class="pt"><b>on 13</b> · 19m</div></div>
+          <div class="slot s-lb"><div class="pos">LB</div><div class="pn">Sofia L.</div><div class="pt"><b>on 0</b> · 10m</div></div>
+          <div class="slot longest s-cb"><div class="pos">CB</div><div class="pn">Emma T.</div><div class="pt"><span class="long">on 23</span> · 23m</div></div>
+          <div class="slot s-rb"><div class="pos">RB</div><div class="pn">Harper J.</div><div class="pt"><b>on 13</b> · 13m</div></div>
+          <div class="slot s-gk"><div class="pos">GK</div><div class="pn">Maya R.</div><div class="pt"><b>on 23</b> · 23m</div></div>
+        </div>
+        <div class="sect"><span>Bench · 2</span><span>game · season</span></div>
+        <div class="bench">
+          <div class="bchip"><span class="pn">Lily P.</span><span class="pt">23m<small>157 szn</small></span></div>
+          <div class="bchip unav"><span class="pn">Zoe M.</span><span class="pt">✕ 0m<small>45 szn</small></span></div>
+        </div>
+      </div>
+      <div class="toast"><span class="grow">Sub recorded at <b>23:02</b></span><a>−10s</a><a>Undo</a></div>
+    </div></div>
+    <figcaption><b>③ After “Sub now”</b>Jumps back to On Field. The toast lets you nudge the time back in 10s steps (if you tapped late) or undo. Next Up resets to a copy of the new lineup.</figcaption>
+  </figure>
+</div>
+
+<div class="note"><b>Rules of Next Up</b>
+<ol>
+  <li>Only one queued lineup at a time (no planning further ahead in the MVP).</li>
+  <li>Next Up is a per-coach <b>draft</b>, saved on that phone, so it survives switching tabs, locking the phone or closing the app. Only what actually gets subbed counts toward the record. (If the sync engine makes a shared draft basically free, we can share it. That's a tech-doc decision.)</li>
+  <li>If a player in Next Up becomes unavailable before the sub, their slot turns red and "Sub now" is disabled until it's fixed.</li>
+  <li>Position moves with no one coming in (e.g. Ruby CB→LF) are subs too. They start a new shift so time per position stays accurate.</li>
+</ol></div>
+
+<!-- ================================================================ -->
+<h2 id="unavail">9. Flow: injury / unavailable / late arrival</h2>
+<p>Tap any player (in either view) to open the <b>player sheet</b>. What it offers depends on where the player is.</p>
+<div class="screens">
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>9:30</span><span>●●●</span></div>
+      <div class="clockbar">
+        <div><div class="half">1st half</div><div class="vs">vs Tigers</div></div>
+        <div class="grow"></div>
+        <div class="clock">26:40</div>
+        <div class="cbtn">⋯</div>
+      </div>
+      <div class="body">
+        <div class="seg"><div class="on">On Field</div><div>Next Up</div></div>
+        <div class="field">
+          <div class="box"></div>
+          <div class="slot longest s-lf"><div class="pos">LF</div><div class="pn">Ruby W.</div><div class="pt"><span class="long">on 20</span> · 20m</div></div>
+          <div class="slot longest s-cf"><div class="pos">CF</div><div class="pn">Ava K.</div><div class="pt"><span class="long">on 20</span> · 23m</div></div>
+          <div class="slot s-rf"><div class="pos">RF</div><div class="pn">Chloe D.</div><div class="pt"><b>on 16</b> · 22m</div></div>
+          <div class="slot s-lb hurt"><div class="pos">LB</div><div class="pn">Sofia L.</div><div class="pt"><b>on 3</b> · 13m</div></div>
+          <div class="slot longest s-cb"><div class="pos">CB</div><div class="pn">Emma T.</div><div class="pt"><span class="long">on 26</span> · 26m</div></div>
+          <div class="slot s-rb"><div class="pos">RB</div><div class="pn">Harper J.</div><div class="pt"><b>on 16</b> · 16m</div></div>
+          <div class="slot s-gk"><div class="pos">GK</div><div class="pn">Maya R.</div><div class="pt"><b>on 26</b> · 26m</div></div>
+        </div>
+      </div>
+      <div class="scrim"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <h4>Sofia L. <span class="pill blue">LB</span></h4>
+        <div class="dim" style="color:var(--ink-3);font-size:11px">13m on field this game · 10m bench</div>
+        <div class="sect">Replace at LB with</div>
+        <div class="chips"><span class="chip on">Lily P. · 23m</span><span class="chip">Leave empty</span></div>
+        <span class="btn" style="background:var(--unavail)">Sub off now · unavailable</span>
+        <span class="btn ghost">Sub off now · still available</span>
+      </div>
+    </div></div>
+    <figcaption><b>On-field player sheet</b>Covers the injury/sick/bathroom case: subbed off right away, marked unavailable, and the replacement chosen all at once. No reason is recorded (could be added later). Replacement options are sorted by fewest minutes.</figcaption>
+  </figure>
+
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>9:34</span><span>●●●</span></div>
+      <div class="clockbar">
+        <div><div class="half">1st half</div><div class="vs">vs Tigers</div></div>
+        <div class="grow"></div>
+        <div class="clock">30:40</div>
+        <div class="cbtn">⋯</div>
+      </div>
+      <div class="body">
+        <div class="seg"><div class="on">On Field</div><div>Next Up</div></div>
+        <div class="field sm">
+          <div class="box"></div>
+          <div class="slot s-lf"><div class="pn">Ruby W.</div></div>
+          <div class="slot s-cf"><div class="pn">Ava K.</div></div>
+          <div class="slot s-rf"><div class="pn">Chloe D.</div></div>
+          <div class="slot s-lb"><div class="pn">Lily P.</div></div>
+          <div class="slot s-cb"><div class="pn">Emma T.</div></div>
+          <div class="slot s-rb"><div class="pn">Harper J.</div></div>
+          <div class="slot s-gk"><div class="pn">Maya R.</div></div>
+        </div>
+        <div class="sect"><span>Bench · 2</span><span>game · season</span></div>
+        <div class="bench">
+          <div class="bchip unav"><span class="pn">Sofia L.</span><span class="pt">✕ 13m<small>96 szn</small></span></div>
+          <div class="bchip unav"><span class="pn">Zoe M.</span><span class="pt">✕ 0m<small>45 szn</small></span></div>
+        </div>
+        <div class="sect"><span>Not here · 2</span><span></span></div>
+        <div class="bench">
+          <div class="bchip" style="opacity:.6"><span class="pn">Ella S.</span><span class="pt">+ arrived</span></div>
+          <div class="bchip" style="opacity:.6"><span class="pn">Nora B.</span><span class="pt">+ arrived</span></div>
+        </div>
+      </div>
+      <div class="scrim"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <h4>Sofia L. <span class="pill unav">Unavailable</span></h4>
+        <div class="dim" style="color:var(--ink-3);font-size:11px">Since 26:40 · 13m on field this game</div>
+        <span class="btn green">Mark available ✓</span>
+      </div>
+    </div></div>
+    <figcaption><b>Bench player sheet</b>Toggle available/unavailable. A bench player can also be marked unavailable from here. The "Not here" group at the bottom is for late arrivals: one tap makes them present and available.</figcaption>
+  </figure>
+</div>
+<p class="meta">Late arrival: the player is counted as present from the moment they're tapped. Earlier minutes count as "not here", not as bench time.</p>
+
+<!-- ================================================================ -->
+<h2 id="halftime">10. Halftime &amp; end of game</h2>
+<div class="screens">
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>9:36</span><span>●●●</span></div>
+      <div class="clockbar" style="background:#4a5866">
+        <div><div class="half">Halftime</div><div class="vs">vs Tigers</div></div>
+        <div class="grow"></div>
+        <div class="clock" style="font-size:20px">1H 31:12</div>
+      </div>
+      <div class="body">
+        <div class="sect"><span>2nd half lineup</span><span>1st half min</span></div>
+        <div class="field">
+          <div class="box"></div>
+          <div class="slot s-lf chg"><div class="pos">LF</div><div class="pn">Maya R.</div><div class="out">was GK · 31m</div></div>
+          <div class="slot s-cf"><div class="pos">CF</div><div class="pn">Ava K.</div><div class="pt">31m</div></div>
+          <div class="slot s-rf chg"><div class="pos">RF</div><div class="pn">Sofia L.</div><div class="out">IN · 13m</div></div>
+          <div class="slot s-lb"><div class="pos">LB</div><div class="pn">Lily P.</div><div class="pt">27m</div></div>
+          <div class="slot s-cb chg"><div class="pos">CB</div><div class="pn">Chloe D.</div><div class="out">was RF · 23m</div></div>
+          <div class="slot s-rb"><div class="pos">RB</div><div class="pn">Harper J.</div><div class="pt">23m</div></div>
+          <div class="slot s-gk chg"><div class="pos">GK</div><div class="pn">Ruby W.</div><div class="out">was LF · 31m</div></div>
+        </div>
+        <div class="sect"><span>Bench</span><span></span></div>
+        <div class="bench">
+          <div class="bchip out"><span class="pn">Emma T.</span><span class="pt">31m</span></div>
+          <div class="bchip unav"><span class="pn">Zoe M.</span><span class="pt">✕ 0m</span></div>
+        </div>
+      </div>
+      <div class="foot"><span class="btn green">Start 2nd half ▶</span></div>
+    </div></div>
+    <figcaption><b>Halftime</b>The clock bar turns gray and stops. It's basically the starting-lineup screen, with 1st-half minutes on every chip. Halftime isn't counted as bench time. Sofia is available again here.</figcaption>
+  </figure>
+
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>10:12</span><span>●●●</span></div>
+      <div class="appbar"><span class="back">‹</span><span class="title">vs Tigers<span class="sub">Final · Sat Oct 10</span></span><span class="iconbtn">✎</span></div>
+      <div class="body">
+        <div class="seg"><div class="on">Minutes</div><div>Timeline</div></div>
+        <table class="grid">
+          <tr><th></th><th>GK</th><th>LB</th><th>CB</th><th>RB</th><th>LF</th><th>CF</th><th>RF</th><th>Bn</th><th>Tot</th></tr>
+          <tr><td>Ava K.</td><td></td><td></td><td></td><td></td><td></td><td class="h4">48</td><td></td><td>12</td><td><b>48</b></td></tr>
+          <tr><td>Chloe D.</td><td></td><td></td><td class="h2">30</td><td></td><td></td><td></td><td class="h2">23</td><td>7</td><td><b>53</b></td></tr>
+          <tr><td>Emma T.</td><td></td><td></td><td class="h1">10</td><td></td><td class="h2">21</td><td></td><td></td><td>29</td><td><b>31</b></td></tr>
+          <tr><td>Harper J.</td><td></td><td></td><td></td><td class="h3">38</td><td></td><td></td><td></td><td>22</td><td><b>38</b></td></tr>
+          <tr><td>Lily P.</td><td></td><td class="h3">42</td><td></td><td></td><td></td><td></td><td></td><td>18</td><td><b>42</b></td></tr>
+          <tr><td>Maya R.</td><td class="h2">31</td><td></td><td></td><td></td><td class="h2">29</td><td></td><td></td><td>0</td><td><b>60</b></td></tr>
+          <tr><td>Ruby W.</td><td class="h2">29</td><td></td><td class="h1">13</td><td></td><td class="h1">8</td><td></td><td></td><td>10</td><td><b>50</b></td></tr>
+          <tr><td>Sofia L.</td><td></td><td class="h1">11</td><td></td><td></td><td></td><td></td><td class="h2">25</td><td><span style="color:var(--unavail)">4*</span>+20</td><td><b>36</b></td></tr>
+          <tr><td>Zoe M.</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><span style="color:var(--unavail)">60*</span></td><td><b>0</b></td></tr>
+        </table>
+        <div class="hint" style="text-align:left">Bn = bench. <span style="color:var(--unavail)">*</span> = unavailable minutes. Tap a row → player detail.</div>
+        <div class="row" style="margin-top:auto;opacity:.55"><span class="grow"><div class="nm">Export game data <span class="pill">post-MVP</span></div><div class="dim">CSV / JSON (e.g. to feed an LLM)</div></span><span class="dim">›</span></div>
+      </div>
+    </div></div>
+    <figcaption><b>Game summary (Final)</b>Shown after <i>End game</i>. Players × positions in minutes. Export (CSV/JSON, post-MVP) supports the plan of using an outside LLM to help plan lineups.</figcaption>
+  </figure>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="review">11. Game review &amp; editing</h2>
+<p>Mistakes during a game are expected. A game is edited as a <b>timeline of shifts</b>, which matches how coaches remember a game ("we subbed around 10 minutes in, then again near halftime"). It can be edited during the game (⋯ → Game timeline) or after.</p>
+<div class="screens">
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>8:15</span><span>●●●</span></div>
+      <div class="appbar"><span class="back">‹</span><span class="title">vs Tigers<span class="sub">Timeline · editing</span></span><span style="color:var(--accent);font-weight:700">Done</span></div>
+      <div class="body">
+        <div class="seg"><div>Minutes</div><div class="on">Timeline</div></div>
+        <div class="tl">
+          <div class="sect">1st half</div>
+          <div class="tlrow"><span class="tm">0:00</span><span class="what"><b>Kickoff</b> · starting 7</span><span class="ed">Edit</span></div>
+          <div class="tlrow hl"><span class="tm">10:15</span><span class="what"><b>Sub</b> · Harper→RB<br><span style="color:var(--ink-3)">out: Sofia</span></span><span class="ed">Edit</span></div>
+          <div class="tlrow"><span class="tm">23:02</span><span class="what"><b>Sub</b> · Sofia→LB · 2 moves</span><span class="ed">Edit</span></div>
+          <div class="tlrow"><span class="tm">26:40</span><span class="what"><b style="color:var(--unavail)">Sofia unavailable</b> · Lily→LB</span><span class="ed">Edit</span></div>
+          <div class="tlrow"><span class="tm">31:12</span><span class="what"><b>End of half</b></span><span class="ed">Edit</span></div>
+          <div class="sect">2nd half</div>
+          <div class="tlrow"><span class="tm">0:00</span><span class="what"><b>Kickoff</b> · 4 changes</span><span class="ed">Edit</span></div>
+          <div class="tlrow"><span class="tm">14:30</span><span class="what"><b>Sub</b> · Emma→LF · 1 move</span><span class="ed">Edit</span></div>
+        </div>
+        <div class="btn ghost sm" style="align-self:flex-start">+ Insert sub / event</div>
+      </div>
+    </div></div>
+    <figcaption><b>Timeline</b>One row per event. Tap Edit to change it, or insert one you forgot to record.</figcaption>
+  </figure>
+
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>8:16</span><span>●●●</span></div>
+      <div class="appbar"><span class="back">‹</span><span class="title">Edit sub<span class="sub">1st half</span></span><span style="color:var(--accent);font-weight:700">Save</span></div>
+      <div class="body">
+        <div class="sect">Time</div>
+        <div class="row" style="justify-content:center;gap:14px"><span class="iconbtn">−</span><span class="mono" style="font-size:22px;font-weight:700">10:15</span><span class="iconbtn">+</span></div>
+        <div class="hint">Must be between 0:00 and 23:02 (neighboring events)</div>
+        <div class="sect">Lineup from this point</div>
+        <div class="field sm">
+          <div class="box"></div>
+          <div class="slot s-lf"><div class="pn">Emma T.</div></div>
+          <div class="slot s-cf"><div class="pn">Ava K.</div></div>
+          <div class="slot s-rf"><div class="pn">Chloe D.</div></div>
+          <div class="slot s-lb"><div class="pn">Lily P.</div></div>
+          <div class="slot s-cb"><div class="pn">Ruby W.</div></div>
+          <div class="slot s-rb chg"><div class="pn">Harper J.</div></div>
+          <div class="slot s-gk"><div class="pn">Maya R.</div></div>
+        </div>
+        <div class="bench">
+          <div class="bchip out"><span class="pn">Sofia L.</span><span class="pt">out</span></div>
+          <div class="bchip unav"><span class="pn">Zoe M.</span><span class="pt">✕</span></div>
+        </div>
+        <div style="flex:1"></div>
+        <span class="btn ghost" style="color:var(--unavail)">Delete this sub</span>
+      </div>
+    </div></div>
+    <figcaption><b>Edit a sub</b>Change the time with ± steppers (or tap to type) and fix the lineup with the same tap-tap field. Deleting a sub merges its shift into the one before.</figcaption>
+  </figure>
+</div>
+<div class="note"><b>Edit rules (UX level)</b>
+<ol>
+  <li>Editing one shift's lineup does <i>not</i> change later shifts. Each sub records the full lineup at that moment, so there are no surprise knock-on changes.</li>
+  <li>Unavailable windows are edited the same way (start/end time).</li>
+  <li>Attendance can be changed after the game too. Unmarking a player who appears in shifts asks for confirmation.</li>
+  <li>Stats recalculate right away.</li>
+</ol></div>
+
+<!-- ================================================================ -->
+<h2 id="stats">12. Stats</h2>
+<p>Two levels: a <b>team grid</b> for seeing fairness at a glance, and a <b>player detail</b> view. Both work for the season or a single game.</p>
+<div class="screens">
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>9:41</span><span>●●●</span></div>
+      <div class="appbar"><span class="title">Stats<span class="sub">Fall 2026 · 5 games</span></span></div>
+      <div class="body">
+        <div class="seg"><div class="on">Season</div><div>Pick game ▾</div></div>
+        <div class="seg"><div class="on">Minutes</div><div>% of time</div></div>
+        <table class="grid">
+          <tr><th></th><th>GK</th><th>LB</th><th>CB</th><th>RB</th><th>LF</th><th>CF</th><th>RF</th><th>Field</th></tr>
+          <tr><td>Maya R.</td><td class="h4">93</td><td class="h1">20</td><td class="h0">0</td><td class="h1">18</td><td class="h3">61</td><td class="h1">22</td><td class="h0">0</td><td><b>214</b></td></tr>
+          <tr><td>Ruby W.</td><td class="h3">60</td><td class="h1">15</td><td class="h3">55</td><td class="h0">0</td><td class="h1">28</td><td class="h1">12</td><td class="h1">30</td><td><b>200</b></td></tr>
+          <tr><td>Ava K.</td><td class="h0">0</td><td class="h0">0</td><td class="h1">12</td><td class="h0">0</td><td class="h1">20</td><td class="h4">150</td><td class="h1">16</td><td><b>198</b></td></tr>
+          <tr><td>Chloe D.</td><td class="h1">30</td><td class="h1">25</td><td class="h2">40</td><td class="h1">20</td><td class="h1">10</td><td class="h0">0</td><td class="h2">47</td><td><b>172</b></td></tr>
+          <tr><td>Lily P.</td><td class="h0">0</td><td class="h4">120</td><td class="h1">10</td><td class="h1">12</td><td class="h0">0</td><td class="h1">15</td><td class="h0">0</td><td><b>157</b></td></tr>
+          <tr><td>Emma T.</td><td class="h0">0</td><td class="h0">0</td><td class="h2">35</td><td class="h1">10</td><td class="h3">70</td><td class="h1">20</td><td class="h1">16</td><td><b>151</b></td></tr>
+          <tr><td>Harper J.</td><td class="h1">17</td><td class="h0">0</td><td class="h1">14</td><td class="h3">80</td><td class="h0">0</td><td class="h0">0</td><td class="h1">29</td><td><b>140</b></td></tr>
+          <tr><td>Sofia L.</td><td class="h0">0</td><td class="h1">30</td><td class="h0">0</td><td class="h1">25</td><td class="h1">12</td><td class="h1">18</td><td class="h2">45</td><td><b>130</b></td></tr>
+          <tr><td>Nora B.</td><td class="h0">0</td><td class="h1">22</td><td class="h1">18</td><td class="h1">25</td><td class="h1">14</td><td class="h0">0</td><td class="h1">20</td><td><b>99</b></td></tr>
+          <tr><td>Ella S.</td><td class="h0">0</td><td class="h1">10</td><td class="h1">20</td><td class="h1">12</td><td class="h0">0</td><td class="h1">22</td><td class="h1">10</td><td><b>74</b></td></tr>
+          <tr><td>Zoe M.</td><td class="h0">0</td><td class="h1">15</td><td class="h0">0</td><td class="h1">20</td><td class="h0">0</td><td class="h1">10</td><td class="h0">0</td><td><b>45</b></td></tr>
+        </table>
+        <div class="hint" style="text-align:left"><b style="color:var(--unavail)">0</b> = never played that position. Darker = more minutes.</div>
+      </div>
+      <div class="tabs"><div><i>⚽</i>Games</div><div><i>👥</i>Roster</div><div class="on"><i>📊</i>Stats</div></div>
+    </div></div>
+    <figcaption><b>Team grid</b>Answers both core questions at once: "who's short on minutes?" (Field column) and "who hasn't tried what?" (red zeros). Column headers sort the table.</figcaption>
+  </figure>
+
+  <figure class="shot">
+    <div class="phone"><div class="scr">
+      <div class="status"><span>9:41</span><span>●●●</span></div>
+      <div class="appbar"><span class="back">‹</span><span class="title">Sofia L.<span class="sub">Season</span></span></div>
+      <div class="body" style="gap:10px">
+        <div class="seg"><div class="on">Season</div><div>By game</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center">
+          <div class="row" style="flex-direction:column;gap:0;padding:6px"><b style="font-size:16px">4/5</b><span class="dim" style="font-size:10px;color:var(--ink-3)">games</span></div>
+          <div class="row" style="flex-direction:column;gap:0;padding:6px"><b style="font-size:16px">130</b><span class="dim" style="font-size:10px;color:var(--ink-3)">field min</span></div>
+          <div class="row" style="flex-direction:column;gap:0;padding:6px"><b style="font-size:16px">57%</b><span class="dim" style="font-size:10px;color:var(--ink-3)">of avail. time</span></div>
+        </div>
+        <div>
+          <div class="sect">Time breakdown</div>
+          <div class="stack"><span style="width:54%;background:var(--grass)"></span><span style="width:40%;background:#b9c3cc"></span><span style="width:6%;background:var(--unavail)"></span></div>
+          <div class="dim" style="font-size:10px;color:var(--ink-3);margin-top:3px">Field 130 · Bench avail 98 · Bench unavail 12</div>
+        </div>
+        <div class="sect">Minutes by position</div>
+        <div style="display:grid;grid-template-columns:24px 1fr 28px;gap:5px 6px;align-items:center;font-size:11px">
+          <b>GK</b><div class="bar"><span style="width:0"></span></div><span class="mono" style="color:var(--unavail)">0</span>
+          <b>LB</b><div class="bar"><span style="width:33%"></span></div><span class="mono">30</span>
+          <b>CB</b><div class="bar"><span style="width:0"></span></div><span class="mono" style="color:var(--unavail)">0</span>
+          <b>RB</b><div class="bar"><span style="width:28%"></span></div><span class="mono">25</span>
+          <b>LF</b><div class="bar"><span style="width:13%"></span></div><span class="mono">12</span>
+          <b>CF</b><div class="bar"><span style="width:20%"></span></div><span class="mono">18</span>
+          <b>RF</b><div class="bar"><span style="width:50%"></span></div><span class="mono">45</span>
+        </div>
+        <div class="sect">Games</div>
+        <div class="row" style="padding:6px 8px"><span class="grow"><div class="nm" style="font-size:12px">vs Tigers · Oct 10</div><div class="dim">36m · LB 11, RF 25 · ✕ 4m</div></span><span class="dim">›</span></div>
+        <div class="row" style="padding:6px 8px"><span class="grow"><div class="nm" style="font-size:12px">vs Rockets · Oct 3</div><div class="dim">34m · RB 25, CF 9</div></span><span class="dim">›</span></div>
+      </div>
+    </div></div>
+    <figcaption><b>Player detail</b>Summary tiles, the time-bucket bar (field / bench available / bench unavailable) and per-position bars. "By game" (or tapping a game row) shows the same layout for a single game.</figcaption>
+  </figure>
+</div>
+<div class="note"><b>Default fairness metric:</b> "% of available time" = field minutes ÷ (minutes present and available). It doesn't penalize kids for absences, injuries or late arrivals. Raw minutes is always one toggle away.</div>
+
+<!-- ================================================================ -->
+<h2 id="misc">13. Sign-in, two coaches, dim mode</h2>
+<h3>Sign-in</h3>
+<ol>
+  <li>First launch: enter your email, get a magic link, done. Only invited coaches can see the team. No passwords.</li>
+  <li>Stays signed in on the device. No sign-in screen at the field.</li>
+</ol>
+<h3>Two coaches</h3>
+<ol>
+  <li>Both coaches see the same live game on their own phones, updating within seconds when online.</li>
+  <li>Either one can record subs. In practice one coach holds the clock phone. The other can watch minutes and build their own Next Up draft.</li>
+  <li>A small indicator in the clock bar shows sync status (synced / offline, will sync). Being offline never blocks recording.</li>
+</ol>
+<h3>Dim mode</h3>
+<ol>
+  <li>Browsers can't dim the backlight. Dim mode is basically one CSS rule: a fixed black overlay at ~75% opacity on top of the app. It cuts glare and saves battery on OLED phones.</li>
+  <li>Cheap to build, so it's in the MVP if it stays trivial. Otherwise it gets cut.</li>
+  <li>Turned on from ⋯, or automatically after ~60s with no tap during a half (one timer). The first tap only wakes the screen and doesn't hit the button underneath.</li>
+</ol>
+
+<!-- ================================================================ -->
+<h2 id="oos">14. Out of scope (MVP)</h2>
+<ol>
+  <li>Goals, scores, assists or any other game stats.</li>
+  <li>Lineup suggestions or fairness algorithms (coaches decide, and exported data can go to an outside LLM).</li>
+  <li>Planning lineups more than one shift ahead.</li>
+  <li>Multiple teams, seasons or formations in the UI (formation is config only).</li>
+  <li>Parent or player-facing views.</li>
+  <li>Data export (CSV/JSON). Planned soon after MVP.</li>
+  <li>Unavailable reasons, jersey numbers.</li>
+</ol>
+
+<!-- ================================================================ -->
+<h2 id="questions">15. Decisions log</h2>
+<h3>Decided (v0.2)</h3>
+<ol>
+  <li>Clock counts up and the coach taps End half / End game. No target length, no added time.</li>
+  <li>Field slots show stint + game total, with the 2 longest outfield stints highlighted. Bench chips show game + season minutes.</li>
+  <li>No unavailable reasons, just available/unavailable.</li>
+  <li>Next Up is a per-coach draft unless the sync engine makes sharing free.</li>
+  <li>No jersey numbers. Last initial(s) can be more than one letter.</li>
+  <li>Default fairness metric is % of available time. Raw minutes come from the same data.</li>
+  <li>Dim mode: CSS overlay plus inactivity timer. MVP only if trivial.</li>
+  <li>Export CSV/JSON: post-MVP.</li>
+  <li>Halftime counts as nothing.</li>
+</ol>
+<h3>Open</h3>
+<p>None right now.</p>
+
+</main>
+</body>
+</html>
