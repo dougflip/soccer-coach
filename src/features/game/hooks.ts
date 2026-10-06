@@ -9,7 +9,7 @@ import { LineupSchema } from "../../domain/events.ts";
 import type { GameId, PlayerId, TeamId } from "../../domain/ids.ts";
 import { effectiveEvents } from "../../domain/log.ts";
 import { lineupsEqual, type LineupDiff } from "../../domain/lineup-edit.ts";
-import type { Lineup } from "../../domain/positions.ts";
+import { POSITIONS, type Lineup } from "../../domain/positions.ts";
 import { buildSegments } from "../../domain/segments.ts";
 import { statsByPlayer, totalFieldMs } from "../../domain/stats.ts";
 
@@ -96,7 +96,11 @@ export function useLineupDraft(key: string, base: Lineup) {
   return { draft, set, reset, dirty: !lineupsEqual(draft, base) };
 }
 
-export function diffSummary(diff: LineupDiff, name: (id: PlayerId) => string): string[] {
+export function diffSummary(
+  diff: LineupDiff,
+  name: (id: PlayerId) => string,
+  next?: Lineup,
+): string[] {
   const lines: string[] = [];
   if (diff.in.length)
     lines.push(`In: ${diff.in.map((x) => `${name(x.playerId)} → ${x.position}`).join(", ")}`);
@@ -106,7 +110,18 @@ export function diffSummary(diff: LineupDiff, name: (id: PlayerId) => string): s
       `Move: ${diff.moves.map((x) => `${name(x.playerId)} ${x.from}→${x.to}`).join(", ")}`,
     );
   }
+  if (next) {
+    const empty = POSITIONS.filter((p) => next[p] === null);
+    if (empty.length) lines.push(`Empty: ${empty.join(", ")}`);
+  }
   return lines;
+}
+
+/** Whole minutes; a short but real stint shows as "<1" rather than "0". */
+export function minutesLabel(ms: number): string {
+  if (ms <= 0) return "0";
+  const m = Math.round(ms / 60_000);
+  return m === 0 ? "<1" : String(m);
 }
 
 export const mins = (ms: number) => `${Math.floor(ms / 60_000)}m`;

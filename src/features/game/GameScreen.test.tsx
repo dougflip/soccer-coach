@@ -103,8 +103,12 @@ describe("game screen flow", () => {
     expect(v.snapshot.lineup.GK).toBe(pid("maya"));
     expect(v.snapshot.present.has(pid("nora"))).toBe(false);
 
-    // --- Next Up: Harper in for Sofia, then Sub now
+    // --- Next Up: send Sofia to the bench first, then put Harper at RB, then Sub now
     await user.click(screen.getByRole("button", { name: /^Next Up/ }));
+    await user.click(slot("RB"));
+    await user.click(screen.getByRole("button", { name: "Send Sofia to bench" }));
+    expect(screen.getByText(/Empty: RB/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: /^Sofia.*OUT/ })).toBeTruthy(); // now on the bench
     await user.click(screen.getByRole("button", { name: /^Harper/ }));
     await user.click(slot("RB"));
     expect(screen.getByText(/In: Harper → RB/)).toBeTruthy();

@@ -28,6 +28,10 @@ export function swapSpots(lineup: Lineup, a: Spot, b: Spot): Lineup {
   return mapPositions((p) => (p === slot.position ? bench.playerId : lineup[p]));
 }
 
+/** Send a slot's player to the bench, leaving the slot empty. */
+export const clearSlot = (lineup: Lineup, position: Position): Lineup =>
+  mapPositions((p) => (p === position ? null : lineup[p]));
+
 export type TapState = { lineup: Lineup; selected: Spot | null };
 
 /**

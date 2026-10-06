@@ -6,9 +6,9 @@ import { totalFieldMs } from "../../domain/stats.ts";
 import { PageHeader, ui } from "../../ui/primitives.tsx";
 import { formatGameDate } from "../games/dates.ts";
 import styles from "./game.module.css";
-import type { Players } from "./hooks.ts";
+import { minutesLabel, type Players } from "./hooks.ts";
 
-const m = (ms: number) => (ms === 0 ? "" : String(Math.round(ms / 60_000)));
+const m = (ms: number) => (ms === 0 ? "" : minutesLabel(ms));
 
 /** Minutes by position for this game. (Fuller review + editing comes in M3.) */
 export function FinalView({
@@ -59,7 +59,7 @@ export function FinalView({
                   ))}
                   <td>{m(s.benchAvailableMs + s.benchUnavailableMs)}</td>
                   <td>
-                    <b>{m(totalFieldMs(s)) || "0"}</b>
+                    <b>{minutesLabel(totalFieldMs(s))}</b>
                   </td>
                 </tr>
               );

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { diffLineups, swapSpots, tap, type Spot } from "./lineup-edit.ts";
+import { clearSlot, diffLineups, swapSpots, tap, type Spot } from "./lineup-edit.ts";
 import { periodClock } from "./clock.ts";
 import { pauseClock, startPeriod } from "./commands.ts";
 import { lineupOf, nameOf, pid, testGame } from "./test-utils.ts";
@@ -24,6 +24,14 @@ describe("swapSpots", () => {
   it("puts a bench player in a slot (either tap order) and benches the occupant", () => {
     expect(swapSpots(L, bench("harper"), slot("RB")).RB).toBe(pid("harper"));
     expect(swapSpots(L, slot("RB"), bench("harper")).RB).toBe(pid("harper"));
+  });
+});
+
+describe("clearSlot", () => {
+  it("benches the player and leaves the slot empty", () => {
+    const cleared = clearSlot(L, "LB");
+    expect(cleared.LB).toBeNull();
+    expect(diffLineups(L, cleared).out.map((o) => nameOf(o.playerId))).toEqual(["lily"]);
   });
 });
 

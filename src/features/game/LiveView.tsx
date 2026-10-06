@@ -68,6 +68,10 @@ export function LiveView({
   const benchIds = [...present]
     .filter((id) => !onField.has(id))
     .toSorted((a, b) => Number(unavailable.has(a)) - Number(unavailable.has(b)) || byMinutes(a, b));
+  // Next Up can bench anyone currently on the field, so offer every present player.
+  const nextUpPool = [...present].toSorted(
+    (a, b) => Number(unavailable.has(a)) - Number(unavailable.has(b)) || byMinutes(a, b),
+  );
   const notHere = players.roster.map((p) => p.id).filter((id) => !present.has(id));
   const gameMin = (id: PlayerId) => mins(view.fieldMs(id));
   const seasonMin = (id: PlayerId) => mins((season.get(id) ?? 0) + view.fieldMs(id));
@@ -211,7 +215,7 @@ export function LiveView({
               lineup={next.draft}
               onChange={next.set}
               base={lineup}
-              benchIds={benchIds}
+              benchIds={nextUpPool}
               unavailable={unavailable}
               name={players.name}
               slotDetail={gameMin}
@@ -219,7 +223,7 @@ export function LiveView({
             />
             {changes > 0 && (
               <div className={styles.diff}>
-                {diffSummary(diff, players.name).map((line) => (
+                {diffSummary(diff, players.name, next.draft).map((line) => (
                   <p key={line}>{line}</p>
                 ))}
               </div>

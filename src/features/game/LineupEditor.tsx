@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from "react";
 import type { PlayerId } from "../../domain/ids.ts";
-import { sameSpot, tap, type Spot } from "../../domain/lineup-edit.ts";
-import { mapPositions, positionOf, type Lineup } from "../../domain/positions.ts";
+import { clearSlot, sameSpot, tap, type Spot } from "../../domain/lineup-edit.ts";
+import { mapPositions, positionOf, type Lineup, type Position } from "../../domain/positions.ts";
+import { Button } from "../../ui/primitives.tsx";
 import { BenchView, FieldView, type ChipView, type SlotView } from "./FieldView.tsx";
 import styles from "./game.module.css";
 
@@ -78,6 +79,16 @@ export function LineupEditor({
       };
     });
 
+  // A field player is selected: offer to bench them (frees the slot for a later tap).
+  const benchable =
+    selected?.kind === "slot"
+      ? { position: selected.position, playerId: lineup[selected.position] }
+      : null;
+  const sendToBench = (position: Position) => {
+    onChange(clearSlot(lineup, position));
+    setSelected(null);
+  };
+
   return (
     <>
       <FieldView
@@ -85,6 +96,11 @@ export function LineupEditor({
         name={name}
         onTap={(position) => onTap({ kind: "slot", position })}
       />
+      {benchable && benchable.playerId !== null && (
+        <Button variant="ghost" onClick={() => sendToBench(benchable.position)}>
+          Send {name(benchable.playerId)} to bench
+        </Button>
+      )}
       <BenchView
         chips={chips}
         name={name}
@@ -94,7 +110,7 @@ export function LineupEditor({
       <p className={styles.hint}>
         {selected
           ? "Tap where they go (or tap again to cancel)"
-          : "Tap a player, then where they go"}
+          : "Tap a player, then where they go (or send them to the bench)"}
       </p>
     </>
   );
