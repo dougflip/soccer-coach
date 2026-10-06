@@ -13,7 +13,8 @@
     "format:check": "oxfmt --check",
     "test": "vitest",
     "test:run": "vitest run",
-    "check": "concurrently \"npm:typecheck\" \"npm:lint\" \"npm:format:check\""
+    "check": "concurrently \"npm:typecheck\" \"npm:lint\" \"npm:format:check\"",
+    "icons": "pwa-assets-generator"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
@@ -32,6 +33,7 @@
     "@types/node": "^26.6.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@vite-pwa/assets-generator": "^2.0.0",
     "@vitejs/plugin-react": "^6.1.2",
     "babel-plugin-react-compiler": "^1.0.0",
     "concurrently": "^10.0.5",
@@ -42,6 +44,11 @@
     "oxlint-tsgolint": "^7.0.2003",
     "typescript": "^7.0.2",
     "vite": "^8.3.3",
-    "vitest": "^5.0.3"
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^5.0.3",
+    "workbox-window": "^7.4.1"
+  },
+  "overrides": {
+    "shell-quote": "^1.12.0"
   }
 }

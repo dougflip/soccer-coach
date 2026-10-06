@@ -17,6 +17,10 @@ const SyncContext = createContext<SyncEngine | null>(null);
 export function SyncProvider({ teamId, children }: { teamId: TeamId; children: ReactNode }) {
   const [engine] = useState(() => new SyncEngine(db, supabaseBackend(supabase), teamId));
   useEffect(() => engine.start(), [engine]);
+  useEffect(() => {
+    // Ask the browser not to evict IndexedDB (and any unsynced outbox) under storage pressure.
+    void navigator.storage?.persist?.();
+  }, []);
   return <SyncContext value={engine}>{children}</SyncContext>;
 }
 
