@@ -33,6 +33,16 @@ export function FinalView({
             ‹
           </Link>
         }
+        right={
+          <Link
+            to="/games/$gameId/timeline"
+            params={{ gameId: game.id }}
+            className={ui.iconButton}
+            aria-label="Edit timeline"
+          >
+            ✎
+          </Link>
+        }
       />
       <div className={ui.page}>
         <table className={styles.table}>

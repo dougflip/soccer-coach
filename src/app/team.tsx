@@ -71,6 +71,11 @@ export function TeamGate({
   return <TeamContext value={state.teamId}>{children}</TeamContext>;
 }
 
+/** Provide a known team directly (tests, harness). The app uses <TeamGate>. */
+export function TeamIdProvider({ teamId, children }: { teamId: TeamId; children: ReactNode }) {
+  return <TeamContext value={teamId}>{children}</TeamContext>;
+}
+
 export function useTeamId(): TeamId {
   const teamId = use(TeamContext);
   if (!teamId) throw new Error("useTeamId must be used inside <TeamGate>");

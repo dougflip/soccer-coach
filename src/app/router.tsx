@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-router";
 import { GameFormPage } from "../features/games/GameFormPage.tsx";
 import { GamePage } from "../features/game/GamePage.tsx";
+import { TimelinePage } from "../features/game/TimelinePage.tsx";
 import { GamesPage } from "../features/games/GamesPage.tsx";
 import { PlayerFormPage } from "../features/roster/PlayerFormPage.tsx";
 import { RosterPage } from "../features/roster/RosterPage.tsx";
@@ -54,6 +55,14 @@ const gameIndexRoute = createRoute({
   component: function GameRouteComponent() {
     const { gameId } = gameRoute.useParams();
     return <GamePage gameId={gameId} />;
+  },
+});
+const timelineRoute = createRoute({
+  getParentRoute: () => gameRoute,
+  path: "/timeline",
+  component: function TimelineRouteComponent() {
+    const { gameId } = gameRoute.useParams();
+    return <TimelinePage gameId={gameId} />;
   },
 });
 const editGameRoute = createRoute({
@@ -105,7 +114,7 @@ const routeTree = rootRoute.addChildren([
   gamesRoute.addChildren([
     gamesIndexRoute,
     newGameRoute,
-    gameRoute.addChildren([gameIndexRoute, editGameRoute]),
+    gameRoute.addChildren([gameIndexRoute, editGameRoute, timelineRoute]),
   ]),
   rosterRoute.addChildren([rosterIndexRoute, newPlayerRoute, playerRoute]),
   statsRoute,

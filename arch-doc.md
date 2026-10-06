@@ -301,6 +301,8 @@ triggers, last-write-wins. Fancy parts wait.
 | M2  | Pre-game (attendance, starting lineup), Live game (clock, On Field, Next Up, Sub now + undo, player sheet incl. injury sub-off, available toggle, late arrival, halftime, end game), wake lock | Can run a real game                                                                       |
 | M3  | Game minutes table + season team grid (same component), simple timeline: list events, delete (void), edit time                                                                                 | See fairness, fix obvious mistakes                                                        |
 
+Status (2026-10-06): M1 done except the Pages deploy (waiting on the repo); M2 and M3 done.
+
 Phase 1 cuts: realtime, clock-skew offset, player detail screen, lineup editing in the
 timeline (void + re-record instead), dim mode, update prompt (new version activates on next
 launch), JSON export.

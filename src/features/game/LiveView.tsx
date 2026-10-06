@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { repos } from "../../data/repos/index.ts";
 import type { Game } from "../../data/schemas.ts";
@@ -314,6 +315,13 @@ export function LiveView({
           <p className={styles.sheetSub}>
             The clock normally runs nonstop; pause only if you need to.
           </p>
+          <Link
+            to="/games/$gameId/timeline"
+            params={{ gameId: game.id }}
+            className={`${ui.button} ${ui.ghost}`}
+          >
+            Game timeline (fix mistakes)
+          </Link>
         </Sheet>
       )}
     </>
