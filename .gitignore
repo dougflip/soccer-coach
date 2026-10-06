@@ -1,6 +1,9 @@
 node_modules
 dist
 *.tsbuildinfo
-.env
-.env.*
-!.env.example
+# .env holds only public values (Supabase URL + publishable key); secrets go in .env.local
+.env.local
+.env.*.local
+
+# Seed with real emails stays local
+supabase/seed.local.sql

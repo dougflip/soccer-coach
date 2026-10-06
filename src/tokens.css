@@ -4,6 +4,8 @@
   --color-ink-2: #4a5866;
   --color-ink-3: #8593a0;
   --color-surface: #ffffff;
+  --color-surface-2: #eef1f4;
+  --color-paper: #f6f4ef;
   --color-line: #e2ded5;
   --color-grass: #2f8f4e;
   --color-next: #e8771a;
@@ -23,8 +25,13 @@
   --space-4: 16px;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
+  -webkit-tap-highlight-color: transparent;
   font-family: var(--font-sans);
   color: var(--color-ink);
   background: var(--color-surface);
