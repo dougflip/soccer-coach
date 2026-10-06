@@ -53,7 +53,7 @@ export function LiveView({
   const [tab, setTab] = useState<"field" | "next">("field");
   const [panel, setPanel] = useState<Panel>(null);
   const [lastSub, setLastSub] = useState<EventId | null>(null);
-  const season = useSeasonFieldMs(game.id);
+  const season = useSeasonFieldMs(game.teamId, game.id);
   const { lineup, present, unavailable } = view.snapshot;
   const at: GameTime = view.at ?? { period, ms: 0 };
   // Stamp actions with the game time at the tap, not at the last (up to 1s old) render.

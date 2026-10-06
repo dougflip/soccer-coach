@@ -33,7 +33,7 @@ export function PregameView({
   const rosterIds = players.roster.map((p) => p.id);
   const present = attendance(view.effective, rosterIds);
   const presentIds = rosterIds.filter((id) => present.get(id) === true);
-  const season = useSeasonFieldMs(game.id);
+  const season = useSeasonFieldMs(game.teamId, game.id);
   const lineupDraft = useLineupDraft(`draft:start:${game.id}`, view.snapshot.lineup);
   // Absent players can't start.
   const draft = lineupDraft.draft;

@@ -36,18 +36,22 @@ export function playersView(players: Player[] | undefined) {
   return { loaded: players !== undefined, byId, name, roster };
 }
 
-/** Season field minutes (ms) per player across finished/other games. */
-export function useSeasonFieldMs(excludeGameId: GameId): ReadonlyMap<PlayerId, number> {
+/** Season field minutes (ms) per player across the team's other (non-deleted) games. */
+export function useSeasonFieldMs(
+  teamId: TeamId,
+  excludeGameId: GameId,
+): ReadonlyMap<PlayerId, number> {
   const totals = useLiveQuery(async () => {
+    const gameIds = new Set((await repos.games.list(teamId)).map((g) => g.id));
     const out = new Map<PlayerId, number>();
     for (const [gameId, events] of await repos.events.byGame()) {
-      if (gameId === excludeGameId) continue;
+      if (gameId === excludeGameId || !gameIds.has(gameId)) continue;
       for (const [id, s] of statsByPlayer(buildSegments(effectiveEvents(events)))) {
         out.set(id, (out.get(id) ?? 0) + totalFieldMs(s));
       }
     }
     return out;
-  }, [excludeGameId]);
+  }, [teamId, excludeGameId]);
   return totals ?? new Map();
 }
 
