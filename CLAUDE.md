@@ -1,7 +1,8 @@
 # Soccer Coach
 
 PWA for youth soccer coaches to track lineups, playing time and positions.
-Start with `high-level-design.md` (goals, key decisions), then `design-doc.html` (UX).
+Start with `high-level-design.md` (goals, key decisions), then `design-doc.html` (UX), then
+`arch-doc.md` (architecture, phasing). Phase 1 = Supabase + basic sync (no realtime).
 
 ## Commands
 

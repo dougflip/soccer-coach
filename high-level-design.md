@@ -99,4 +99,4 @@ React. Supabase (auth, Postgres, RLS). Offline sync: Supabase + small local outb
 ## Docs
 
 1. `design-doc.html`: UI/UX design (screens, flows, mockups). Not architecture.
-2. Tech/architecture doc: comes after UX is settled.
+2. `arch-doc.md`: architecture + phasing (Phase 1: Supabase + basic sync this season; realtime etc. later).
