@@ -160,11 +160,12 @@ the small indicator in the clock bar (UX §13).
 
 ## 7. Auth & access
 
-1. **Email one-time code** (Supabase `signInWithOtp` + `verifyOtp`): coach types the 6-digit
-   code into the app.
-   1. Why not a magic link: on iOS, a home-screen PWA has separate storage from Safari, so a
-      link opened from Mail logs in Safari, not the installed app. Codes avoid redirect URLs
-      entirely, which also sidesteps hash-routing conflicts.
+1. **Email + password** (`signInWithPassword`). Coach accounts are created in the Supabase
+   dashboard with a generated password (saved in each coach's password manager); sign-ups
+   are disabled.
+   1. Why not email codes / magic links: Supabase's built-in email can't use edited templates
+      and only delivers to org members, so any email login needs custom SMTP. Not worth it for
+      2 users; revisit (e.g. Resend) if needed.
 2. Session persists in local storage; refresh tokens keep coaches logged in for the season.
 3. Supabase project uses the new publishable key in the client (public by design; RLS is the
    security boundary).
@@ -179,10 +180,9 @@ the small indicator in the clock bar (UX §13).
    -- game_events: insert + select only (no update/delete policies => immutable)
    ```
 
-5. Team setup for MVP: one SQL seed script creates the team and adds both coaches'
-   `user_id`s after they've signed in once. No invite UI yet.
-6. Signup restricted: disable open signups in Supabase or accept that non-members see nothing
-   (RLS). Prefer disabling signups and inviting the two emails from the dashboard.
+5. Team setup for MVP: create the coach in the dashboard (with password), then a SQL seed
+   adds them to `team_members` (done via MCP for team "Galaxy"). No invite UI yet.
+6. Sign-ups are disabled in Supabase; non-members would see nothing anyway (RLS).
 
 ## 8. Client structure
 
@@ -297,7 +297,7 @@ triggers, last-write-wins. Fancy parts wait.
 | #   | Scope                                                                                                                                                                                          | Done when                                                                                 |
 | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | M0  | Scaffold + domain spike                                                                                                                                                                        | ✅                                                                                        |
-| M1  | Supabase schema + RLS + seed, email-code login, Dexie + repos + basic sync, Roster CRUD, Games list + new game, Pages deploy, installable PWA (basic manifest + precache)                      | Roster and games saved to Supabase from my phone, visible on a second phone after refresh |
+| M1  | Supabase schema + RLS + seed, email/password login, Dexie + repos + basic sync, Roster CRUD, Games list + new game, Pages deploy, installable PWA (basic manifest + precache)                  | Roster and games saved to Supabase from my phone, visible on a second phone after refresh |
 | M2  | Pre-game (attendance, starting lineup), Live game (clock, On Field, Next Up, Sub now + undo, player sheet incl. injury sub-off, available toggle, late arrival, halftime, end game), wake lock | Can run a real game                                                                       |
 | M3  | Game minutes table + season team grid (same component), simple timeline: list events, delete (void), edit time                                                                                 | See fairness, fix obvious mistakes                                                        |
 
@@ -324,8 +324,8 @@ launch), JSON export.
 
 ## 15. Decisions log
 
-1. Login: email one-time code. Needed once per device: Supabase refresh tokens don't expire by
-   default, so coaches stay signed in until they sign out, clear site data or switch phones.
+1. Login: email + password (no SMTP needed). Once per device: Supabase refresh tokens don't
+   expire by default, so coaches stay signed in until they sign out, clear site data or switch phones.
 2. Local dev: Supabase CLI local stack (Docker) for dev/migrations, one hosted
    project for prod. Supabase MCP for inspecting/querying.
 3. Repo is public. Nothing secret ships (publishable key is public by design). Seed script
