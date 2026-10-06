@@ -9,6 +9,16 @@ export function eventsRepo(db: SoccerDb) {
       return rows.map((r) => GameEventSchema.parse(r));
     },
 
+    /** Every event, grouped by game (season stats). */
+    async byGame(): Promise<Map<GameId, GameEvent[]>> {
+      const out = new Map<GameId, GameEvent[]>();
+      for (const row of await db.gameEvents.toArray()) {
+        const e = GameEventSchema.parse(row);
+        out.set(e.gameId, [...(out.get(e.gameId) ?? []), e]);
+      }
+      return out;
+    },
+
     /** Append events (immutable). Multiple events from one action land atomically. */
     async append(...events: GameEvent[]): Promise<void> {
       const valid = events.map((e) => GameEventSchema.parse(e));

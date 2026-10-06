@@ -1,0 +1,74 @@
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: none;
+  background: rgb(14 19 24 / 45%);
+}
+
+.sheet {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 560px;
+  max-height: 85dvh;
+  margin: 0 auto;
+  padding: var(--space-2) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom));
+  width: auto;
+  overflow-y: auto;
+  border: none;
+  border-radius: 18px 18px 0 0;
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+
+.grab {
+  width: 36px;
+  height: 4px;
+  margin: 0 auto var(--space-1);
+  border-radius: 2px;
+  background: var(--color-line);
+}
+
+.toast {
+  position: fixed;
+  right: var(--space-3);
+  bottom: calc(80px + env(safe-area-inset-bottom));
+  left: var(--space-3);
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 536px;
+  margin: 0 auto;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--color-surface);
+  background: var(--color-ink);
+  box-shadow: 0 8px 18px rgb(0 0 0 / 25%);
+}
+
+.toastText {
+  flex: 1;
+  font-size: 14px;
+}
+
+.toastAction {
+  min-height: 36px;
+  padding: 0 var(--space-2);
+  border: none;
+  font: inherit;
+  font-weight: 700;
+  color: #ffb36b;
+  background: none;
+}

@@ -6,7 +6,7 @@ import {
   redirect,
 } from "@tanstack/react-router";
 import { GameFormPage } from "../features/games/GameFormPage.tsx";
-import { GamePage } from "../features/games/GamePage.tsx";
+import { GamePage } from "../features/game/GamePage.tsx";
 import { GamesPage } from "../features/games/GamesPage.tsx";
 import { PlayerFormPage } from "../features/roster/PlayerFormPage.tsx";
 import { RosterPage } from "../features/roster/RosterPage.tsx";

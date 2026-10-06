@@ -3,6 +3,8 @@ import { assertNever } from "./events.ts";
 
 type ClockEvent = EventOf<"period_started" | "clock_paused" | "clock_resumed" | "clock_adjusted">;
 
+export type ClockReading = { ms: number; running: boolean };
+
 /**
  * Game clock for one period at wall time `wallNow`, derived from timestamps
  * (never a ticking counter) so it survives phone lock / reload.
@@ -13,10 +15,19 @@ export function periodClockMs(
   period: number,
   wallNow: number,
 ): number | null {
+  return periodClock(effective, period, wallNow)?.ms ?? null;
+}
+
+/** Like `periodClockMs`, plus whether the clock is currently running. */
+export function periodClock(
+  effective: readonly GameEvent[],
+  period: number,
+  wallNow: number,
+): ClockReading | null {
   const ended = effective.find(
     (e): e is EventOf<"period_ended"> => e.type === "period_ended" && e.at.period === period,
   );
-  if (ended) return ended.at.ms;
+  if (ended) return { ms: ended.at.ms, running: false };
 
   const anchors = effective
     .filter(
@@ -65,5 +76,5 @@ export function periodClockMs(
 
   if (!started) return null;
   if (running) ms += Math.max(0, wallNow - lastWall);
-  return ms;
+  return { ms, running };
 }

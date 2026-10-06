@@ -21,7 +21,7 @@ const base = {
   createdAt: z.int(),
 };
 
-const LineupSchema = z.record(PositionSchema, PlayerIdSchema.nullable());
+export const LineupSchema = z.record(PositionSchema, PlayerIdSchema.nullable());
 
 export const GameEventSchema = z.discriminatedUnion("type", [
   z.object({
